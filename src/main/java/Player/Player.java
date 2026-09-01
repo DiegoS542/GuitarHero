@@ -2,6 +2,8 @@ package Player;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -24,10 +26,22 @@ public class Player {
     PlayerNote yellowNote = new PlayerNote(new Color(54, 58, 59), new Color(254, 254, 53), new Color(254, 254, 53));
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
-    final JLabel noteStreakLabel = new JLabel("Note Streak: 0");
-    final JLabel multiplierLabel = new JLabel("Multiplier: 1x");
-    final JLabel scoreLabel = new JLabel("Score: 0");
-    final JLabel lifeLabel = new JLabel("Life: 50");
+    final JLabel noteStreakLabel = hudLabel("Note Streak: 0");
+    final JLabel multiplierLabel = hudLabel("Multiplier: 1x");
+    final JLabel scoreLabel = hudLabel("Score: 0");
+    int hudX;
+
+    private static JLabel hudLabel(String text) {
+        return new JLabel(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setColor(new Color(0, 0, 0, 150));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                super.paintComponent(g);
+            }
+        };
+    }
 
     public Player(String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         this.life = 50;
@@ -70,18 +84,14 @@ public class Player {
     }
 
     public void addComponents(Tab tab, int x) {
+        this.hudX = x;
         noteStreakLabel.setBounds(x, 15, 175, 50);
-        noteStreakLabel.setForeground(Color.WHITE);
         labelDesign(noteStreakLabel);
         multiplierLabel.setBounds(x, 65, 175, 50);
-        multiplierLabel.setForeground(Color.WHITE);
         labelDesign(multiplierLabel);
         scoreLabel.setBounds(x, 115, 175, 50);
-        scoreLabel.setForeground(Color.WHITE);
         labelDesign(scoreLabel);
-        lifeLabel.setBounds(x, 165, 175, 50);
-        lifeLabel.setForeground(Color.WHITE);
-        labelDesign(lifeLabel);
+        scoreLabel.setFont(new Font("Verdana", Font.BOLD, 22));
         greenNote.setBounds(xpos, ypos, 50, 35);
         redNote.setBounds(xpos + 75, ypos, 50, 35);
         yellowNote.setBounds(xpos + 150, ypos, 50, 35);
@@ -90,7 +100,6 @@ public class Player {
         tab.add(noteStreakLabel);
         tab.add(multiplierLabel);
         tab.add(scoreLabel);
-        tab.add(lifeLabel);
         tab.add(greenNote);
         tab.add(redNote);
         tab.add(yellowNote);
@@ -101,9 +110,7 @@ public class Player {
     public void labelDesign(JLabel label) {
         label.setFont(new Font("Verdana", Font.BOLD, 18));
         label.setForeground(new Color(255, 255, 255));
-        label.setBackground(new Color(34, 34, 34));
-        label.setOpaque(true);
-        label.setBorder(BorderFactory.createLineBorder((new Color(47, 127, 255)), 2));
+        label.setOpaque(false);
         label.setHorizontalAlignment(SwingConstants.CENTER);
     }
     
@@ -111,7 +118,6 @@ public class Player {
         tab.remove(noteStreakLabel);
         tab.remove(multiplierLabel);
         tab.remove(scoreLabel);
-        tab.remove(lifeLabel);
         tab.remove(greenNote);
         tab.remove(redNote);
         tab.remove(yellowNote);

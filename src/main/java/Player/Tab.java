@@ -141,10 +141,12 @@ public class Tab extends JPanel {
             g.drawImage(stageImage, 0, 0, getWidth(), getHeight(), this);
         }
         drawLines(g, xpos, ypos);
+        drawLifeBar(g, player);
         if (!notes.isEmpty()) {
             paintNotes(g, notes, player);
         }
         if (multiplayer) {
+            drawLifeBar(g, player2);
             if (!notes2.isEmpty())
                 paintNotes(g, notes2, player2);
             drawLines(g, xpos, ypos);
@@ -258,7 +260,21 @@ public class Tab extends JPanel {
         }
         player.scoreLabel.setText("Score: " + player.score);
         player.multiplierLabel.setText("Multiplier: " + player.multiplier + "x");
-        player.lifeLabel.setText("Life: " + player.life);
+
+        Color multiplierColor = switch (player.multiplier) {
+            case 2 -> new Color(80, 220, 80);
+            case 3 -> new Color(255, 215, 0);
+            case 4 -> new Color(255, 140, 0);
+            default -> Color.WHITE;
+        };
+        player.multiplierLabel.setForeground(multiplierColor);
+
+        Color streakColor;
+        if (player.noteStreak >= 50)       streakColor = new Color(255, 100, 30);
+        else if (player.noteStreak >= 25)  streakColor = new Color(255, 215, 0);
+        else if (player.noteStreak >= 10)  streakColor = new Color(0, 200, 220);
+        else                               streakColor = Color.WHITE;
+        player.noteStreakLabel.setForeground(streakColor);
     }
 
     public void KB() {
@@ -570,6 +586,36 @@ public class Tab extends JPanel {
             stage = imageIcon;
         }
         repaint();
+    }
+
+    private void drawLifeBar(Graphics g, Player player) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        int barX = player.hudX;
+        int barY = 170;
+        int barW = 175;
+        int barH = 22;
+        int filled = (int) (barW * (player.life / 100.0));
+
+        g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRoundRect(barX, barY, barW, barH, 8, 8);
+
+        Color fillColor = player.life > 60
+                ? new Color(30, 200, 50)
+                : player.life > 30 ? new Color(220, 200, 30) : new Color(200, 40, 30);
+        if (filled > 0) {
+            g2.setColor(fillColor);
+            g2.fillRoundRect(barX, barY, filled, barH, 8, 8);
+        }
+
+        g2.setColor(new Color(255, 255, 255, 100));
+        g2.drawRoundRect(barX, barY, barW, barH, 8, 8);
+
+        g2.setFont(new Font("Verdana", Font.BOLD, 12));
+        g2.setColor(Color.WHITE);
+        FontMetrics fm = g2.getFontMetrics();
+        String lifeText = player.life + "%";
+        g2.drawString(lifeText, barX + (barW - fm.stringWidth(lifeText)) / 2, barY + barH - 5);
     }
 
     public void switchToGameMenu(GameMenu mainMenu) {

@@ -13,6 +13,7 @@ import jnafilechooser.api.JnaFileChooser;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.LinearGradientPaint;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -48,7 +49,7 @@ public class GameMenu extends JPanel {
 
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(null);
-        setBackground(new Color(43, 45, 48));
+        setBackground(new Color(5, 5, 5));
         panelWidth = frame.getWidth() / 4;
         controllers = new ControllerManager();
         controllers.initSDLGamepad();
@@ -110,6 +111,31 @@ public class GameMenu extends JPanel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        float[] fractions = {0.0f, 0.55f, 1.0f};
+        Color[] colors = {new Color(5, 5, 5), new Color(20, 10, 35), new Color(60, 5, 20)};
+        g2.setPaint(new LinearGradientPaint(0, 0, 0, getHeight(), fractions, colors));
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        g2.setFont(new Font("Arial Black", Font.BOLD, 80));
+        FontMetrics fm = g2.getFontMetrics();
+        String title = "Guitar Hero";
+        int titleX = (getWidth() - fm.stringWidth(title)) / 2;
+        int titleY = 130;
+
+        g2.setColor(new Color(0, 0, 0, 200));
+        g2.drawString(title, titleX + 4, titleY + 4);
+
+        g2.setColor(Color.WHITE);
+        g2.drawString(title, titleX, titleY);
     }
 
     public SongList getSongList(boolean multiplayer) {

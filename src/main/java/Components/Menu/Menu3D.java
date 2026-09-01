@@ -111,12 +111,20 @@ public class Menu3D extends JComponent {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         for (int i = items.size() - 1; i >= 0; i--) {
+            Menu3dItem item = items.get(i);
             if (i == pressedIndex) {
-                items.get(pressedIndex).getAnimator().show();
+                item.getAnimator().show();
                 hideMenu(pressedIndex);
+                item.setBackground(item.getDefaultBackgroundSelected());
+                item.setColorShadowTop(item.getDefaultColorShadowTopSelected());
+                item.setColorShadowLeft(item.getDefaultColorShadowLeftSelected());
+            } else {
+                item.setBackground(item.getDefaultBackground());
+                item.setColorShadowTop(item.getDefaultColorShadowTop());
+                item.setColorShadowLeft(item.getDefaultColorShadowLeft());
             }
             float angle = 150f;
-            items.get(i).render(g2, 360 - angle, left, this);
+            item.render(g2, 360 - angle, left, this);
         }
         g2.dispose();
         super.paintComponent(g);
