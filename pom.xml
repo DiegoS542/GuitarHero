@@ -13,30 +13,56 @@
             <artifactId>javaparser-core</artifactId>
             <version>2.3.0</version>
         </dependency>
+        <!-- Coordenadas reales en Maven Central son net.java.dev.jna, no com.sun.jna -->
         <dependency>
-            <groupId>com.sun.jna</groupId>
+            <groupId>net.java.dev.jna</groupId>
             <artifactId>jna-jpms</artifactId>
             <version>5.14.0</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jna</groupId>
+            <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
             <version>5.5.0</version>
         </dependency>
+        <!-- Estos tres jars no existen en ningun repositorio Maven publico:
+             se instalaron en el repo local del proyecto (local-repo/), ver <repositories> abajo. -->
         <dependency>
-            <groupId>com.sun.jna</groupId>
-            <artifactId>timingframework</artifactId>
-            <version>1.6.5</version>
+            <groupId>com.studiohartman</groupId>
+            <artifactId>jamepad</artifactId>
+            <version>1.0-local</version>
         </dependency>
         <dependency>
-            <groupId>com.jna</groupId>
-            <artifactId>filechooser</artifactId>
-            <version>1.10.14</version>
+            <groupId>org.jdesktop</groupId>
+            <artifactId>timingframework</artifactId>
+            <version>0.55-local</version>
+        </dependency>
+        <dependency>
+            <groupId>jnafilechooser</groupId>
+            <artifactId>jnafilechooser-api</artifactId>
+            <version>1.0-local</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>project-local-repo</id>
+            <url>${project.baseUri}local-repo</url>
+        </repository>
+    </repositories>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

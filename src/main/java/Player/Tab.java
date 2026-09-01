@@ -28,7 +28,6 @@ import javax.sound.sampled.Clip;
 public class Tab extends JPanel {
 
     JFrame frame;
-    //mysqlConnection connection;
     Player player;
     Player player2;
     Clip clip;
