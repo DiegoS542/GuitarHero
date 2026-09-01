@@ -145,10 +145,12 @@ public class Tab extends JPanel {
         if (!notes.isEmpty()) {
             paintNotes(g, notes, player);
         }
+        drawFeedback(g, player);
         if (multiplayer) {
             drawLifeBar(g, player2);
             if (!notes2.isEmpty())
                 paintNotes(g, notes2, player2);
+            drawFeedback(g, player2);
             drawLines(g, xpos, ypos);
             if (!notes.isEmpty()) {
                 paintNotes(g, notes, player);
@@ -242,6 +244,15 @@ public class Tab extends JPanel {
                     if (player.life < 100) {
                         player.life += 5;
                     }
+                    int dist = element.getY() - ypos;
+                    if (dist <= 35) {
+                        player.feedbackText = "PERFECTO!";
+                        player.feedbackColor = new Color(255, 215, 0);
+                    } else {
+                        player.feedbackText = "GENIAL!";
+                        player.feedbackColor = new Color(100, 220, 255);
+                    }
+                    player.feedbackTimestamp = System.currentTimeMillis();
                 }
             } else if (element.getY() >= screenSize.height && !element.isScored() && element.isInScreen()) {
                 element.setInScreen(false);
@@ -256,15 +267,16 @@ public class Tab extends JPanel {
 
         }
         if (oldNoteStreak != player.noteStreak) {
-            player.noteStreakLabel.setText("Note Streak: " + player.noteStreak);
+            player.noteStreakLabel.setText("Racha: " + player.noteStreak);
         }
-        player.scoreLabel.setText("Score: " + player.score);
-        player.multiplierLabel.setText("Multiplier: " + player.multiplier + "x");
+        player.scoreLabel.setText("Puntaje: " + player.score);
+        player.multiplierLabel.setText("Multiplicador: " + player.multiplier + "x");
 
         Color multiplierColor = switch (player.multiplier) {
             case 2 -> new Color(80, 220, 80);
             case 3 -> new Color(255, 215, 0);
             case 4 -> new Color(255, 140, 0);
+            case 5 -> new Color(220, 50, 255);
             default -> Color.WHITE;
         };
         player.multiplierLabel.setForeground(multiplierColor);
@@ -586,6 +598,29 @@ public class Tab extends JPanel {
             stage = imageIcon;
         }
         repaint();
+    }
+
+    private void drawFeedback(Graphics g, Player player) {
+        if (player.feedbackText == null) return;
+        long elapsed = System.currentTimeMillis() - player.feedbackTimestamp;
+        if (elapsed > 700) { player.feedbackText = null; return; }
+
+        float alpha = 1.0f - (elapsed / 700.0f);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2.setFont(new Font("Arial Black", Font.BOLD, 36));
+        FontMetrics fm = g2.getFontMetrics();
+
+        int centerX = player.xpos + 175;
+        int textX = centerX - fm.stringWidth(player.feedbackText) / 2;
+        int textY = player.ypos - 60;
+
+        Color c = player.feedbackColor;
+        g2.setColor(new Color(0, 0, 0, (int) (180 * alpha)));
+        g2.drawString(player.feedbackText, textX + 2, textY + 2);
+        g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), (int) (255 * alpha)));
+        g2.drawString(player.feedbackText, textX, textY);
     }
 
     private void drawLifeBar(Graphics g, Player player) {

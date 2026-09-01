@@ -26,10 +26,13 @@ public class Player {
     PlayerNote yellowNote = new PlayerNote(new Color(54, 58, 59), new Color(254, 254, 53), new Color(254, 254, 53));
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
-    final JLabel noteStreakLabel = hudLabel("Note Streak: 0");
-    final JLabel multiplierLabel = hudLabel("Multiplier: 1x");
-    final JLabel scoreLabel = hudLabel("Score: 0");
+    final JLabel noteStreakLabel = hudLabel("Racha: 0");
+    final JLabel multiplierLabel = hudLabel("Multiplicador: 1x");
+    final JLabel scoreLabel = hudLabel("Puntaje: 0");
     int hudX;
+    String feedbackText = null;
+    Color feedbackColor = Color.WHITE;
+    long feedbackTimestamp = 0;
 
     private static JLabel hudLabel(String text) {
         return new JLabel(text) {
