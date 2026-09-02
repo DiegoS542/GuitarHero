@@ -12,6 +12,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -35,6 +36,8 @@ public class Tab extends JPanel {
     GameMenu mainMenu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     ImageIcon stage;
+    BufferedImage stageBuffer;
+    private Timer gifTimer;
     int ypos;
     int xpos;
     private final JLabel noteStreak = new JLabel("Note Streak: 0");
@@ -60,8 +63,9 @@ public class Tab extends JPanel {
 
     public Tab(GameMenu mainMenu, Player player, Player player2, Song song, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         setLayout(new GridLayout(1, 1));
+        setBackground(Color.BLACK);
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
-        setBackgroundImage(song.getDifficulty());
+        setBackgroundImage(song);
         shouldPress = false;
         this.player = player;
         this.player2 = player2;
@@ -136,9 +140,8 @@ public class Tab extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (stage != null) {
-            Image stageImage = stage.getImage();
-            g.drawImage(stageImage, 0, 0, getWidth(), getHeight(), this);
+        if (stageBuffer != null) {
+            g.drawImage(stageBuffer, 0, 0, null);
         }
         drawLines(g, xpos, ypos);
         drawLifeBar(g, player);
@@ -615,25 +618,45 @@ public class Tab extends JPanel {
         }
     }
 
-    public void setBackgroundImage(int difficulty) {
-        String imagePath = switch (difficulty) {
-            case 0 -> "src/main/java/Resources/Stages/small_concert.gif/";
-            case 1 -> "src/main/java/Resources/Stages/street.jpg";
-            case 2 -> "src/main/java/Resources/Stages/garage.jpg";
-            case 3 -> "src/main/java/Resources/Stages/little_concert.png";
-            case 4 -> "src/main/java/Resources/Stages/big_concert.jpg";
-            case 5 -> "src/main/java/Resources/Stages/stadium.jpg";
-            default -> "";
+    public void setBackgroundImage(Song song) {
+        String[] pool = {
+            "src/main/java/Resources/Stages/stage.gif",
+            "src/main/java/Resources/Stages/stage2.gif",
+            "src/main/java/Resources/Stages/stage3.gif",
+            "src/main/java/Resources/Stages/stage4.gif",
+            "src/main/java/Resources/Stages/synth.gif"
         };
-        System.out.println(imagePath);
+        String imagePath = pool[(int) (Math.random() * pool.length)];
+
+        if (gifTimer != null) {
+            gifTimer.stop();
+            gifTimer = null;
+        }
 
         ImageIcon imageIcon = new ImageIcon(imagePath);
         if (imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
-            System.err.println("Error: Background image not found or failed to load at " + imagePath);
-        } else {
-            stage = imageIcon;
+            System.err.println("Background no encontrado: " + imagePath);
+            return;
         }
-        repaint();
+
+        stage = imageIcon;
+        int sw = (int) screenSize.getWidth();
+        int sh = (int) screenSize.getHeight();
+        stageBuffer = new BufferedImage(sw, sh, BufferedImage.TYPE_INT_RGB);
+
+        // Render GIF's current frame into stageBuffer at 30 fps.
+        // paintComponent only copies the buffer — no per-repaint scaling or compositing.
+        gifTimer = new Timer(33, e -> {
+            Graphics2D sg = stageBuffer.createGraphics();
+            sg.setColor(Color.BLACK);
+            sg.fillRect(0, 0, sw, sh);
+            sg.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            sg.drawImage(stage.getImage(), 0, 0, sw, sh, null);
+            sg.dispose();
+        });
+        gifTimer.setCoalesce(true);
+        gifTimer.start();
     }
 
     private void drawFeedback(Graphics g, Player player) {
@@ -690,6 +713,7 @@ public class Tab extends JPanel {
     }
 
     public void switchToGameMenu(GameMenu mainMenu) {
+        if (gifTimer != null) { gifTimer.stop(); gifTimer = null; }
         frame.getContentPane().removeAll();
         frame.add(mainMenu);
         mainMenu.resetMenu(frame);
