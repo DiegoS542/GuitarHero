@@ -296,6 +296,9 @@ public class Tab extends JPanel {
                 } else {
                     player.life -= 5;
                 }
+                player.feedbackText = "¡MISS!";
+                player.feedbackColor = new Color(220, 50, 50);
+                player.feedbackTimestamp = System.currentTimeMillis();
             }
 
         }
