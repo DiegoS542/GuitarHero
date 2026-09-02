@@ -151,42 +151,58 @@ public class Tab extends JPanel {
             if (!notes2.isEmpty())
                 paintNotes(g, notes2, player2);
             drawFeedback(g, player2);
-            drawLines(g, xpos, ypos);
-            if (!notes.isEmpty()) {
-                paintNotes(g, notes, player);
-            }
-            if (multiplayer) {
-                if (!notes2.isEmpty())
-                    paintNotes(g, notes2, player2);
-            }
         }
     }
 
     private void drawLines(Graphics g, int xpos, int ypos) {
-        g.setColor(Color.BLACK);
-        g.drawLine(xpos - 25, 0, xpos - 25, ypos + 75);
-        g.drawLine(xpos + 25, 0, xpos + 25, ypos);
-        g.drawLine(xpos + 100, 0, xpos + 100, ypos);
-        g.drawLine(xpos + 175, 0, xpos + 175, ypos);
-        g.drawLine(xpos + 250, 0, xpos + 250, ypos);
-        g.drawLine(xpos + 325, 0, xpos + 325, ypos);
-        g.drawLine(xpos + 375, 0, xpos + 375, ypos + 75);
-
-        g.setColor(new Color(128, 128, 128, 128));
-        g.fillRect(xpos - 25, 0, 400, ypos + 75);
+        drawHighway(g, xpos, ypos);
         if (multiplayer) {
-            g.setColor(Color.BLACK);
-            g.drawLine(xpos * 3 - 25, 0, xpos * 3 - 25, ypos + 75);
-            g.drawLine(xpos * 3 + 25, 0, xpos * 3 + 25, ypos);
-            g.drawLine(xpos * 3 + 100, 0, xpos * 3 + 100, ypos);
-            g.drawLine(xpos * 3 + 175, 0, xpos * 3 + 175, ypos);
-            g.drawLine(xpos * 3 + 250, 0, xpos * 3 + 250, ypos);
-            g.drawLine(xpos * 3 + 325, 0, xpos * 3 + 325, ypos);
-            g.drawLine(xpos * 3 + 375, 0, xpos * 3 + 375, ypos + 75);
-
-            g.setColor(new Color(128, 128, 128, 128));
-            g.fillRect(xpos * 3 - 25, 0, 400, ypos + 75);
+            drawHighway(g, xpos * 3, ypos);
         }
+    }
+
+    private void drawHighway(Graphics g, int hx, int ypos) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // 1. Fondo con gradiente de perspectiva (transparente arriba → oscuro abajo)
+        g2.setPaint(new GradientPaint(0, 0, new Color(0, 0, 0, 0), 0, ypos, new Color(0, 0, 0, 195)));
+        g2.fillRect(hx - 25, 0, 400, ypos + 75);
+
+        // 2. Tinte sutil por carril
+        // Centradas en cada botón (centro botón = hx+25, +100, +175, +250, +325)
+        // Franja de 75px centrada → start = centro - 37
+        int[] laneX = {hx - 12, hx + 63, hx + 138, hx + 213, hx + 288};
+        Color[] laneTints = {
+            new Color(8,   200,  3,   28),
+            new Color(163, 24,   24,  28),
+            new Color(254, 254,  53,  28),
+            new Color(63,  162,  211, 28),
+            new Color(217, 147,  53,  28)
+        };
+        for (int i = 0; i < 5; i++) {
+            g2.setColor(laneTints[i]);
+            g2.fillRect(laneX[i], 0, 75, ypos);
+        }
+
+        // 3. Divisores semi-transparentes
+        g2.setColor(new Color(255, 255, 255, 35));
+        int[] divX = {hx - 25, hx + 25, hx + 100, hx + 175, hx + 250, hx + 325, hx + 375};
+        for (int dx : divX) {
+            g2.drawLine(dx, 0, dx, ypos + 75);
+        }
+
+        // 4. Zona de hit con glow difuso (justo encima de los botones)
+        int hitY = ypos - 4;
+        for (int i = 14; i >= 1; i--) {
+            int alpha = (int) (85 * (1.0 - (double) i / 14));
+            g2.setColor(new Color(255, 255, 255, alpha));
+            g2.drawLine(hx - 25, hitY - i, hx + 375, hitY - i);
+        }
+        g2.setStroke(new BasicStroke(2f));
+        g2.setColor(new Color(255, 255, 255, 215));
+        g2.drawLine(hx - 25, hitY, hx + 375, hitY);
+        g2.setStroke(new BasicStroke(1f));
     }
 
     public void paintNotes(Graphics g, ArrayList<GameNote> notes, Player player) {
@@ -195,8 +211,25 @@ public class Tab extends JPanel {
         while (iterator.hasNext()) {
             GameNote element = iterator.next();
             if (element.isInScreen()) {
-                g.setColor(element.getBorderColor());
-                g.fillOval(element.getX(), element.getY(), 50, 35);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int nx = element.getX();
+                int ny = element.getY();
+                Color base = element.getBorderColor();
+                Color bright = new Color(
+                    Math.min(255, (base.getRed()   + 255) / 2),
+                    Math.min(255, (base.getGreen() + 255) / 2),
+                    Math.min(255, (base.getBlue()  + 255) / 2)
+                );
+                // Glow exterior
+                g2.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), 55));
+                g2.fillOval(nx - 5, ny - 4, 60, 43);
+                // Cuerpo con degradado (brillante arriba → color base abajo)
+                g2.setPaint(new GradientPaint(nx, ny, bright, nx, ny + 35, base));
+                g2.fillOval(nx, ny, 50, 35);
+                // Destello interno (brillo superior izquierdo)
+                g2.setColor(new Color(255, 255, 255, 130));
+                g2.fillOval(nx + 7, ny + 5, 20, 10);
             }
             if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
                 if(vsCPU && player.playerNumber == 2){
