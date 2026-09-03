@@ -602,6 +602,10 @@ public class Tab extends JPanel {
                                 ng2.setExit(true);
                             this.remove(menu);
                             paused = !paused;
+                            player.resetStats();
+                            if (multiplayer) {
+                                player2.resetStats();
+                            }
                             this.repaint();
                             play(selectedSong);
                         } catch (Exception e) {
@@ -610,6 +614,18 @@ public class Tab extends JPanel {
                     break;
 
                     case 2:
+                        paused = false;
+                        exit = true;
+                        gameThread.setExit(true);
+                        ng.setExit(true);
+                        if (multiplayer) {
+                            ng2.setExit(true);
+                        }
+                        running = false;
+                        switchToSongList();
+                        break;
+
+                    case 3:
                         paused = false;
                         exit = true;
                         gameThread.setExit(true);
@@ -626,7 +642,7 @@ public class Tab extends JPanel {
                             //if(controllers != null)
                                 //controllers.quitSDLGamepad();
                             switchToGameMenu(mainMenu);
-                            
+
 
                         }
 
@@ -744,5 +760,14 @@ public class Tab extends JPanel {
         frame.revalidate();
         frame.repaint();
 
+    }
+
+    public void switchToSongList() {
+        if (gifTimer != null) { gifTimer.stop(); gifTimer = null; }
+        mainMenu.restartAudio();
+        frame.getContentPane().removeAll();
+        frame.add(new SongList(mainMenu, frame, (int) screenSize.getWidth(), (int) screenSize.getHeight(), multiplayer ? 2 : 1));
+        frame.revalidate();
+        frame.repaint();
     }
 }

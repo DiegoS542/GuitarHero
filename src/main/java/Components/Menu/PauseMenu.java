@@ -12,9 +12,10 @@ public class PauseMenu extends Menu3D{
         super();
         setBackground(new Color(0, 0, 0, 0.5f));
         items.clear();
-        addMenuItem("Resume");
-        addMenuItem("Restart");
-        addMenuItem("Exit");
+        addMenuItem("Reanudar");
+        addMenuItem("Reiniciar");
+        addMenuItem("Lista de Canciones");
+        addMenuItem("Salir");
         controllers = new ControllerManager();
 
         /*if (controllers.getNumControllers() != 0){

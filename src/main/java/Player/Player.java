@@ -103,6 +103,16 @@ public class Player {
         this.multiplier = 1;
     }
 
+    public void resetStats() {
+        this.life = 50;
+        this.score = 0;
+        this.multiplier = 1;
+        this.noteStreak = 0;
+        this.maxStreak = 0;
+        this.hits = 0;
+        this.misses = 0;
+    }
+
     public void addComponents(Tab tab, int x) {
         this.hudX = x;
         noteStreakLabel.setBounds(x, 15, 230, 50);

@@ -182,7 +182,7 @@ public class GameMenu extends JPanel {
             frame.add(this);
             frame.revalidate();
             frame.repaint();
-            playAudio();
+            restartAudio();
             SwingUtilities.invokeLater(menu::requestFocusInWindow);
         } catch (Exception e) {
         }
@@ -190,6 +190,12 @@ public class GameMenu extends JPanel {
 
     public void playAudio() throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         clip.start();
+    }
+
+    public void restartAudio() {
+        clip.stop();
+        clip.setFramePosition(0);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
     public void switchToOnline(JFrame frame) {
