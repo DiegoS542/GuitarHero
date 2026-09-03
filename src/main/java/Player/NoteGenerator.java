@@ -84,11 +84,11 @@ public class NoteGenerator extends Thread {
         int track = Integer.parseInt(noteParts.trim());
         if (track >= 0 && track <= 4) {
             GameNote note = switch (track) {
-                case 0 -> new GameNote(xpos, 0, new Color(54, 58, 59), new Color(8, 200, 3), time, track); 
-                case 1 -> new GameNote(xpos + 75, 0, new Color(54, 58, 59), new Color(163, 24, 24), time, track);
-                case 2 -> new GameNote(xpos + 150, 0, new Color(54, 58, 59), new Color(254, 254, 53), time, track);
-                case 3 -> new GameNote(xpos + 225, 0, new Color(54, 58, 59), new Color(63, 162, 211), time, track);
-                case 4 -> new GameNote(xpos + 300, 0, new Color(54, 58, 59), new Color(217, 147, 53), time, track);
+                case 0 -> new GameNote(xpos - 5, 0, new Color(54, 58, 59), new Color(8, 200, 3), time, track);
+                case 1 -> new GameNote(xpos + 75 - 5, 0, new Color(54, 58, 59), new Color(163, 24, 24), time, track);
+                case 2 -> new GameNote(xpos + 150 - 5, 0, new Color(54, 58, 59), new Color(254, 254, 53), time, track);
+                case 3 -> new GameNote(xpos + 225 - 5, 0, new Color(54, 58, 59), new Color(63, 162, 211), time, track);
+                case 4 -> new GameNote(xpos + 300 - 5, 0, new Color(54, 58, 59), new Color(217, 147, 53), time, track);
                 default -> null;
             };
             if (note != null) {

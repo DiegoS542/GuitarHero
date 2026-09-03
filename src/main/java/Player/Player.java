@@ -64,6 +64,10 @@ public class Player {
         this.selectedSong = selectedSong;
     }
 
+    public int getScore() {
+        return score;
+    }
+
     public void setXpos(int xpos) {
         this.xpos = xpos;
     }
@@ -88,18 +92,18 @@ public class Player {
 
     public void addComponents(Tab tab, int x) {
         this.hudX = x;
-        noteStreakLabel.setBounds(x, 15, 175, 50);
+        noteStreakLabel.setBounds(x, 15, 230, 50);
         labelDesign(noteStreakLabel);
-        multiplierLabel.setBounds(x, 65, 175, 50);
+        multiplierLabel.setBounds(x, 65, 230, 50);
         labelDesign(multiplierLabel);
-        scoreLabel.setBounds(x, 115, 175, 50);
+        scoreLabel.setBounds(x, 115, 230, 50);
         labelDesign(scoreLabel);
         scoreLabel.setFont(new Font("Verdana", Font.BOLD, 22));
-        greenNote.setBounds(xpos, ypos, 50, 35);
-        redNote.setBounds(xpos + 75, ypos, 50, 35);
-        yellowNote.setBounds(xpos + 150, ypos, 50, 35);
-        blueNote.setBounds(xpos + 225, ypos, 50, 35);
-        orangeNote.setBounds(xpos + 300, ypos, 50, 35);
+        greenNote.setBounds(xpos - 5, ypos, 60, 42);
+        redNote.setBounds(xpos + 75 - 5, ypos, 60, 42);
+        yellowNote.setBounds(xpos + 150 - 5, ypos, 60, 42);
+        blueNote.setBounds(xpos + 225 - 5, ypos, 60, 42);
+        orangeNote.setBounds(xpos + 300 - 5, ypos, 60, 42);
         tab.add(noteStreakLabel);
         tab.add(multiplierLabel);
         tab.add(scoreLabel);

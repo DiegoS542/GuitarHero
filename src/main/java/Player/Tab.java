@@ -3,6 +3,7 @@ package Player;
 import Components.Menu.GameMenu;
 import Components.Menu.Menu3D;
 import Components.Menu.PauseMenu;
+import Components.Menu.ResultsScreen;
 import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
@@ -55,6 +56,7 @@ public class Tab extends JPanel {
     static boolean multiplayer;
     static boolean vsCPU;
     boolean exit;
+    private boolean songEnded = false;
     static int presition = 1;
     GameThread gameThread;
     boolean shouldPress;
@@ -74,14 +76,14 @@ public class Tab extends JPanel {
         this.exit = false;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
-        ypos = (int) screenSize.getHeight() - 75;
+        ypos = (int) screenSize.getHeight() - 60;
         xpos = (int) (screenSize.getWidth() - 300) / 2;
 
         if (multiplayer) {
             xpos /= 2;
             this.player2.setXpos(xpos * 3);
             this.player2.setYpos(ypos);
-            this.player2.addComponents(this, screenSize.width - 185);
+            this.player2.addComponents(this, screenSize.width - 240);
         }
         this.player.setXpos(xpos);
         this.player.setYpos(ypos);
@@ -168,34 +170,15 @@ public class Tab extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // 1. Fondo con gradiente de perspectiva (transparente arriba → oscuro abajo)
-        g2.setPaint(new GradientPaint(0, 0, new Color(0, 0, 0, 0), 0, ypos, new Color(0, 0, 0, 195)));
+        g2.setPaint(new GradientPaint(0, 0, new Color(0, 0, 0, 60), 0, ypos, new Color(0, 0, 0, 235)));
         g2.fillRect(hx - 25, 0, 400, ypos + 75);
 
-        // 2. Tinte sutil por carril
-        // Centradas en cada botón (centro botón = hx+25, +100, +175, +250, +325)
-        // Franja de 75px centrada → start = centro - 37
-        int[] laneX = {hx - 12, hx + 63, hx + 138, hx + 213, hx + 288};
-        Color[] laneTints = {
-            new Color(8,   200,  3,   28),
-            new Color(163, 24,   24,  28),
-            new Color(254, 254,  53,  28),
-            new Color(63,  162,  211, 28),
-            new Color(217, 147,  53,  28)
-        };
-        for (int i = 0; i < 5; i++) {
-            g2.setColor(laneTints[i]);
-            g2.fillRect(laneX[i], 0, 75, ypos);
-        }
-
-        // 3. Divisores semi-transparentes
         g2.setColor(new Color(255, 255, 255, 35));
-        int[] divX = {hx - 25, hx + 25, hx + 100, hx + 175, hx + 250, hx + 325, hx + 375};
+        int[] divX = {hx - 12, hx + 63, hx + 138, hx + 213, hx + 288, hx + 363};
         for (int dx : divX) {
             g2.drawLine(dx, 0, dx, ypos + 75);
         }
 
-        // 4. Zona de hit con glow difuso (justo encima de los botones)
         int hitY = ypos - 4;
         for (int i = 14; i >= 1; i--) {
             int alpha = (int) (85 * (1.0 - (double) i / 14));
@@ -226,13 +209,13 @@ public class Tab extends JPanel {
                 );
                 // Glow exterior
                 g2.setColor(new Color(base.getRed(), base.getGreen(), base.getBlue(), 55));
-                g2.fillOval(nx - 5, ny - 4, 60, 43);
+                g2.fillOval(nx - 5, ny - 4, 70, 50);
                 // Cuerpo con degradado (brillante arriba → color base abajo)
-                g2.setPaint(new GradientPaint(nx, ny, bright, nx, ny + 35, base));
-                g2.fillOval(nx, ny, 50, 35);
+                g2.setPaint(new GradientPaint(nx, ny, bright, nx, ny + 42, base));
+                g2.fillOval(nx, ny, 60, 42);
                 // Destello interno (brillo superior izquierdo)
                 g2.setColor(new Color(255, 255, 255, 130));
-                g2.fillOval(nx + 7, ny + 5, 20, 10);
+                g2.fillOval(nx + 8, ny + 6, 24, 12);
             }
             if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
                 if(vsCPU && player.playerNumber == 2){
@@ -469,6 +452,7 @@ public class Tab extends JPanel {
 
 
     public void play(String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        songEnded = false;
         gameThread = new GameThread(this);
         ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
         notes = ng.getNotes();
@@ -529,6 +513,33 @@ public class Tab extends JPanel {
 
     public void draw() {
         repaint();
+    }
+
+    void checkSongEnd() {
+        if (songEnded || paused || clip == null) return;
+        if (clip.getMicrosecondLength() > 0 && clip.getMicrosecondPosition() >= clip.getMicrosecondLength()) {
+            songEnded = true;
+            endSong();
+        }
+    }
+
+    private void endSong() {
+        exit = true;
+        gameThread.setExit(true);
+        ng.setExit(true);
+        if (multiplayer) {
+            ng2.setExit(true);
+        }
+        running = false;
+        SwingUtilities.invokeLater(() -> {
+            ResultsScreen results = new ResultsScreen(mainMenu, frame,
+                    (int) screenSize.getWidth(), (int) screenSize.getHeight(),
+                    player, multiplayer ? player2 : null);
+            frame.getContentPane().removeAll();
+            frame.add(results);
+            frame.revalidate();
+            frame.repaint();
+        });
     }
 
     public void playAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
@@ -687,7 +698,7 @@ public class Tab extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         int barX = player.hudX;
         int barY = 170;
-        int barW = 175;
+        int barW = 230;
         int barH = 22;
         int filled = (int) (barW * (player.life / 100.0));
 

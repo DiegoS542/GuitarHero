@@ -48,6 +48,7 @@ public class GameThread extends Thread {
     @Override
     public void run() {
         while (!exit) {
+            tab.checkSongEnd();
             tab.repaint();
                 try {
                     TimeUnit.NANOSECONDS.sleep(1000);
