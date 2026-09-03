@@ -56,7 +56,8 @@ public class Tab extends JPanel {
     static boolean multiplayer;
     static boolean vsCPU;
     boolean exit;
-    private boolean songEnded = false;
+    private boolean gameEnded = false;
+    Song song;
     static int presition = 1;
     GameThread gameThread;
     boolean shouldPress;
@@ -72,6 +73,7 @@ public class Tab extends JPanel {
         this.player = player;
         this.player2 = player2;
         this.mainMenu = mainMenu;
+        this.song = song;
         this.selectedSong = song.getName();
         this.exit = false;
         setLayout(null);
@@ -257,6 +259,10 @@ public class Tab extends JPanel {
                     element.setScored(true);
                     player.score += 50 * player.multiplier;
                     player.noteStreak++;
+                    player.hits++;
+                    if (player.noteStreak > player.maxStreak) {
+                        player.maxStreak = player.noteStreak;
+                    }
                     if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
                         player.multiplier++;
                     }
@@ -277,14 +283,16 @@ public class Tab extends JPanel {
                 element.setInScreen(false);
                 player.resetNoteStreak();
                 player.resetMultiplier();
-                if (player.life == 0) {
-                    //System.exit(0);
-                } else {
-                    player.life -= 5;
+                player.misses++;
+                if (player.life > 0) {
+                    player.life = Math.max(0, player.life - 5);
                 }
                 player.feedbackText = "¡MISS!";
                 player.feedbackColor = new Color(220, 50, 50);
                 player.feedbackTimestamp = System.currentTimeMillis();
+                if (player.life == 0) {
+                    finishGame(player);
+                }
             }
 
         }
@@ -293,6 +301,7 @@ public class Tab extends JPanel {
         }
         player.scoreLabel.setText("Puntaje: " + player.score);
         player.multiplierLabel.setText("Multiplicador: " + player.multiplier + "x");
+        player.accuracyLabel.setText(String.format("Precisión: %.2f%%", player.getAccuracy()));
 
         Color multiplierColor = switch (player.multiplier) {
             case 2 -> new Color(80, 220, 80);
@@ -452,7 +461,7 @@ public class Tab extends JPanel {
 
 
     public void play(String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        songEnded = false;
+        gameEnded = false;
         gameThread = new GameThread(this);
         ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
         notes = ng.getNotes();
@@ -516,14 +525,15 @@ public class Tab extends JPanel {
     }
 
     void checkSongEnd() {
-        if (songEnded || paused || clip == null) return;
+        if (gameEnded || paused || clip == null) return;
         if (clip.getMicrosecondLength() > 0 && clip.getMicrosecondPosition() >= clip.getMicrosecondLength()) {
-            songEnded = true;
-            endSong();
+            finishGame(null);
         }
     }
 
-    private void endSong() {
+    void finishGame(Player loser) {
+        if (gameEnded) return;
+        gameEnded = true;
         exit = true;
         gameThread.setExit(true);
         ng.setExit(true);
@@ -531,10 +541,13 @@ public class Tab extends JPanel {
             ng2.setExit(true);
         }
         running = false;
+        if (loser != null) {
+            pauseAudio();
+        }
         SwingUtilities.invokeLater(() -> {
             ResultsScreen results = new ResultsScreen(mainMenu, frame,
                     (int) screenSize.getWidth(), (int) screenSize.getHeight(),
-                    player, multiplayer ? player2 : null);
+                    player, multiplayer ? player2 : null, loser, song);
             frame.getContentPane().removeAll();
             frame.add(results);
             frame.revalidate();

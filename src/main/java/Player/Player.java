@@ -17,6 +17,9 @@ public class Player {
     int multiplier;
     int powerPorcentage;
     int score;
+    int maxStreak;
+    int hits;
+    int misses;
     int xpos;
     int ypos;
     String chartPath;
@@ -29,6 +32,7 @@ public class Player {
     final JLabel noteStreakLabel = hudLabel("Racha: 0");
     final JLabel multiplierLabel = hudLabel("Multiplicador: 1x");
     final JLabel scoreLabel = hudLabel("Puntaje: 0");
+    final JLabel accuracyLabel = hudLabel("Precisión: 100%");
     int hudX;
     String feedbackText = null;
     Color feedbackColor = Color.WHITE;
@@ -68,6 +72,15 @@ public class Player {
         return score;
     }
 
+    public int getMaxStreak() {
+        return maxStreak;
+    }
+
+    public double getAccuracy() {
+        int total = hits + misses;
+        return total == 0 ? 100.0 : (100.0 * hits / total);
+    }
+
     public void setXpos(int xpos) {
         this.xpos = xpos;
     }
@@ -99,6 +112,8 @@ public class Player {
         scoreLabel.setBounds(x, 115, 230, 50);
         labelDesign(scoreLabel);
         scoreLabel.setFont(new Font("Verdana", Font.BOLD, 22));
+        accuracyLabel.setBounds(x, tab.getScreenSize().height - 70, 230, 50);
+        labelDesign(accuracyLabel);
         greenNote.setBounds(xpos - 5, ypos, 60, 42);
         redNote.setBounds(xpos + 75 - 5, ypos, 60, 42);
         yellowNote.setBounds(xpos + 150 - 5, ypos, 60, 42);
@@ -107,6 +122,7 @@ public class Player {
         tab.add(noteStreakLabel);
         tab.add(multiplierLabel);
         tab.add(scoreLabel);
+        tab.add(accuracyLabel);
         tab.add(greenNote);
         tab.add(redNote);
         tab.add(yellowNote);
@@ -125,6 +141,7 @@ public class Player {
         tab.remove(noteStreakLabel);
         tab.remove(multiplierLabel);
         tab.remove(scoreLabel);
+        tab.remove(accuracyLabel);
         tab.remove(greenNote);
         tab.remove(redNote);
         tab.remove(yellowNote);

@@ -120,11 +120,6 @@ public class GameMenu extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        float[] fractions = {0.0f, 0.55f, 1.0f};
-        Color[] colors = {new Color(5, 5, 5), new Color(20, 10, 35), new Color(60, 5, 20)};
-        g2.setPaint(new LinearGradientPaint(0, 0, 0, getHeight(), fractions, colors));
-        g2.fillRect(0, 0, getWidth(), getHeight());
-
         g2.setFont(new Font("Arial Black", Font.BOLD, 80));
         FontMetrics fm = g2.getFontMetrics();
         String title = "Guitar Hero";
