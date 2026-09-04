@@ -24,6 +24,7 @@ public class Settings extends JPanel {
         menu.items.clear();
         menu.addMenuItem("Modificar velocidad");
         menu.addMenuItem("Dificultad CPU");
+        menu.addMenuItem("Mapeo de teclas");
         menu.setFocusable(true);
         menu.requestFocusInWindow();
         menu.addEvent(index -> {
@@ -33,6 +34,9 @@ public class Settings extends JPanel {
                     break;
                 case 1:
                     switchToCPUSettings(frame);
+                    break;
+                case 2:
+                    switchToKeyBindingSettings(frame);
                     break;
             }
         });
@@ -66,7 +70,15 @@ public class Settings extends JPanel {
     }
     
     public void switchToCPUSettings(JFrame frame) {
-        CPUSettings settings = new CPUSettings(frame,gameMenu, WIDTH, HEIGHT); 
+        CPUSettings settings = new CPUSettings(frame,gameMenu, WIDTH, HEIGHT);
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(settings);
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    public void switchToKeyBindingSettings(JFrame frame) {
+        KeyBindingSettings settings = new KeyBindingSettings(gameMenu, frame, WIDTH, HEIGHT);
         frame.getContentPane().removeAll();
         frame.getContentPane().add(settings);
         frame.revalidate();

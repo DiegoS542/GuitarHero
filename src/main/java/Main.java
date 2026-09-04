@@ -1,4 +1,5 @@
 import Components.Menu.GameMenu;
+import Player.Tab;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,6 +8,8 @@ import java.awt.event.WindowEvent;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        Tab.loadKeyBindings();
+
         JFrame game = new JFrame("Game");
         game.setUndecorated(true);
         game.setExtendedState(JFrame.MAXIMIZED_BOTH);

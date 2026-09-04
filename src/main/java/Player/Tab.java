@@ -17,9 +17,12 @@ import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,6 +63,8 @@ public class Tab extends JPanel {
     Song song;
     private static final long HIT_COOLDOWN_MS = 90;
     static int presition = 1;
+    static int[] player1Keys = {KeyEvent.VK_A, KeyEvent.VK_S, KeyEvent.VK_D, KeyEvent.VK_F, KeyEvent.VK_G};
+    static int[] player2Keys = {KeyEvent.VK_Y, KeyEvent.VK_U, KeyEvent.VK_I, KeyEvent.VK_O, KeyEvent.VK_P};
     GameThread gameThread;
     boolean shouldPress;
     public volatile boolean running = true;
@@ -105,6 +110,56 @@ public class Tab extends JPanel {
 
     public static void setPresition(int presition) {
         Tab.presition = presition;
+    }
+
+    public static void setPlayer1Key(int lane, int keyCode) {
+        player1Keys[lane] = keyCode;
+    }
+
+    public static void setPlayer2Key(int lane, int keyCode) {
+        player2Keys[lane] = keyCode;
+    }
+
+    public static int[] getPlayer1Keys() {
+        return player1Keys;
+    }
+
+    public static int[] getPlayer2Keys() {
+        return player2Keys;
+    }
+
+    private static final String KEY_CONFIG_PATH = "config/keybindings.properties";
+
+    public static void loadKeyBindings() {
+        File file = new File(KEY_CONFIG_PATH);
+        if (!file.exists()) return;
+        Properties props = new Properties();
+        try (FileInputStream in = new FileInputStream(file)) {
+            props.load(in);
+            for (int i = 0; i < 5; i++) {
+                String p1 = props.getProperty("player1." + i);
+                if (p1 != null) player1Keys[i] = Integer.parseInt(p1);
+                String p2 = props.getProperty("player2." + i);
+                if (p2 != null) player2Keys[i] = Integer.parseInt(p2);
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveKeyBindings() {
+        File file = new File(KEY_CONFIG_PATH);
+        file.getParentFile().mkdirs();
+        Properties props = new Properties();
+        for (int i = 0; i < 5; i++) {
+            props.setProperty("player1." + i, String.valueOf(player1Keys[i]));
+            props.setProperty("player2." + i, String.valueOf(player2Keys[i]));
+        }
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            props.store(out, "Guitar Hero key bindings");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setYpos(int ypos) {
@@ -333,41 +388,41 @@ public class Tab extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A:
+                switch (laneOf(player1Keys, e.getKeyCode())) {
+                    case 0:
                         player.greenNote.setReleased(true);
                         break;
-                    case KeyEvent.VK_S:
+                    case 1:
                         player.redNote.setReleased(true);
                         break;
-                    case KeyEvent.VK_D:
+                    case 2:
                         player.yellowNote.setReleased(true);
                         break;
-                    case KeyEvent.VK_F:
+                    case 3:
                         player.blueNote.setReleased(true);
                         break;
-                    case KeyEvent.VK_G:
+                    case 4:
                         player.orangeNote.setReleased(true);
                         break;
-                    case KeyEvent.VK_ESCAPE:
-                        togglePause();
-                        break;
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    togglePause();
                 }
                 if (multiplayer && !vsCPU) {
-                    switch (e.getKeyCode()) {
-                        case KeyEvent.VK_Y:
+                    switch (laneOf(player2Keys, e.getKeyCode())) {
+                        case 0:
                             player2.greenNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_U:
+                        case 1:
                             player2.redNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_I:
+                        case 2:
                             player2.yellowNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_O:
+                        case 3:
                             player2.blueNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_P:
+                        case 4:
                             player2.orangeNote.setReleased(true);
                             break;
                     }
@@ -376,47 +431,47 @@ public class Tab extends JPanel {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A:
+                switch (laneOf(player1Keys, e.getKeyCode())) {
+                    case 0:
                         player.greenNote.setReleased(false);
                         player.greenNote.setClicked(true);
                         break;
-                    case KeyEvent.VK_S:
+                    case 1:
                         player.redNote.setReleased(false);
                         player.redNote.setClicked(true);
                         break;
-                    case KeyEvent.VK_D:
+                    case 2:
                         player.yellowNote.setReleased(false);
                         player.yellowNote.setClicked(true);
                         break;
-                    case KeyEvent.VK_F:
+                    case 3:
                         player.blueNote.setReleased(false);
                         player.blueNote.setClicked(true);
                         break;
-                    case KeyEvent.VK_G:
+                    case 4:
                         player.orangeNote.setReleased(false);
                         player.orangeNote.setClicked(true);
                         break;
                 }
                 if (multiplayer && !vsCPU) {
-                    switch (e.getKeyCode()) {
-                        case KeyEvent.VK_Y:
+                    switch (laneOf(player2Keys, e.getKeyCode())) {
+                        case 0:
                             player2.greenNote.setReleased(false);
                             player2.greenNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_U:
+                        case 1:
                             player2.redNote.setReleased(false);
                             player2.redNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_I:
+                        case 2:
                             player2.yellowNote.setReleased(false);
                             player2.yellowNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_O:
+                        case 3:
                             player2.blueNote.setReleased(false);
                             player2.blueNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_P:
+                        case 4:
                             player2.orangeNote.setReleased(false);
                             player2.orangeNote.setClicked(true);
                             break;
@@ -427,6 +482,13 @@ public class Tab extends JPanel {
         this.addKeyListener(kb);
 
 
+    }
+
+    private int laneOf(int[] keys, int keyCode) {
+        for (int i = 0; i < keys.length; i++) {
+            if (keys[i] == keyCode) return i;
+        }
+        return -1;
     }
 
     private void handleControllerInput(ControllerState currState, PlayerNote greenNote, PlayerNote redNote, PlayerNote yellowNote, PlayerNote blueNote, PlayerNote orangeNote) {
