@@ -37,6 +37,7 @@ public class Player {
     String feedbackText = null;
     Color feedbackColor = Color.WHITE;
     long feedbackTimestamp = 0;
+    long[] lastHitTime = new long[5];
 
     private static JLabel hudLabel(String text) {
         return new JLabel(text) {

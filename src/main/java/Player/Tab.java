@@ -58,6 +58,7 @@ public class Tab extends JPanel {
     boolean exit;
     private boolean gameEnded = false;
     Song song;
+    private static final long HIT_COOLDOWN_MS = 90;
     static int presition = 1;
     GameThread gameThread;
     boolean shouldPress;
@@ -245,11 +246,13 @@ public class Tab extends JPanel {
                     }
                     
                 }
-                if ((player.greenNote.isReleased() && player.greenNote.isClicked() && element.getX() == player.greenNote.getX()) ||
+                boolean cooledDown = System.currentTimeMillis() - player.lastHitTime[element.getButton()] >= HIT_COOLDOWN_MS;
+                if (cooledDown && ((player.greenNote.isReleased() && player.greenNote.isClicked() && element.getX() == player.greenNote.getX()) ||
                         (player.redNote.isReleased() && player.redNote.isClicked() && element.getX() == player.redNote.getX()) ||
                         (player.yellowNote.isReleased() && player.yellowNote.isClicked() && element.getX() == player.yellowNote.getX()) ||
                         (player.blueNote.isReleased() && player.blueNote.isClicked() && element.getX() == player.blueNote.getX()) ||
-                        (player.orangeNote.isReleased() && player.orangeNote.isClicked() && element.getX() == player.orangeNote.getX())) {
+                        (player.orangeNote.isReleased() && player.orangeNote.isClicked() && element.getX() == player.orangeNote.getX()))) {
+                    player.lastHitTime[element.getButton()] = System.currentTimeMillis();
                     if (element.getX() == player.greenNote.getX()) player.greenNote.setClicked(false);
                     if (element.getX() == player.redNote.getX()) player.redNote.setClicked(false);
                     if (element.getX() == player.yellowNote.getX()) player.yellowNote.setClicked(false);
