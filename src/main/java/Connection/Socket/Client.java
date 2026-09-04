@@ -93,6 +93,7 @@ public class Client extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     gameMenu.resetMenu(frame);
+                    gameMenu.restartAudio();
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
                     Image image = toolkit.createImage(new byte[0]);
                     Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");

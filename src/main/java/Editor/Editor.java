@@ -485,6 +485,7 @@ public class Editor extends JPanel{
                 if(clip != null)
                     clip.stop();
                 mainMenu.resetMenu(frame);
+                mainMenu.restartAudio();
                 Toolkit toolkit = Toolkit.getDefaultToolkit();
                 Image image = toolkit.createImage(new byte[0]);
                 Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");

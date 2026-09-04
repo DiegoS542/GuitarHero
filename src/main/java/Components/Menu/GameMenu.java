@@ -182,7 +182,6 @@ public class GameMenu extends JPanel {
             frame.add(this);
             frame.revalidate();
             frame.repaint();
-            restartAudio();
             SwingUtilities.invokeLater(menu::requestFocusInWindow);
         } catch (Exception e) {
         }

@@ -54,6 +54,7 @@ public class ResultsScreen extends JPanel {
                 }
             } else {
                 mainMenu.resetMenu(frame);
+                mainMenu.restartAudio();
             }
         });
         add(menu);

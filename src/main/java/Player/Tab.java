@@ -822,6 +822,7 @@ public class Tab extends JPanel {
         frame.getContentPane().removeAll();
         frame.add(mainMenu);
         mainMenu.resetMenu(frame);
+        mainMenu.restartAudio();
         frame.revalidate();
         frame.repaint();
 

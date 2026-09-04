@@ -54,7 +54,6 @@ public class Settings extends JPanel {
                     
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    gameMenu.getClip().stop();
                     frame.getContentPane().removeAll();
                     gameMenu.resetMenu(frame);
                 }

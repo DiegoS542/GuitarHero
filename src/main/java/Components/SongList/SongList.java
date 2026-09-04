@@ -115,7 +115,6 @@ public class SongList extends JPanel {
                 frame.repaint();
                 break;
             case KeyEvent.VK_ESCAPE:
-                gameMenu.getClip().stop();
                 running = false;
                 frame.getContentPane().removeAll();
                 frame.getContentPane().add(gameMenu);
