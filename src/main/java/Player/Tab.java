@@ -270,7 +270,7 @@ public class Tab extends JPanel {
                         player.multiplier++;
                     }
                     if (player.life < 100) {
-                        player.life += 5;
+                        player.life = Math.min(100, player.life + 2);
                     }
                     int dist = element.getY() - ypos;
                     if (dist <= 35) {
