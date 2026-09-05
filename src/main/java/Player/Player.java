@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -104,6 +105,14 @@ public class Player {
         this.multiplier = 1;
     }
 
+    public void setShowKeyLabels(boolean show) {
+        greenNote.setShowKeyLabel(show);
+        redNote.setShowKeyLabel(show);
+        yellowNote.setShowKeyLabel(show);
+        blueNote.setShowKeyLabel(show);
+        orangeNote.setShowKeyLabel(show);
+    }
+
     public void resetStats() {
         this.life = 50;
         this.score = 0;
@@ -130,6 +139,14 @@ public class Player {
         yellowNote.setBounds(xpos + 150 - 5, ypos, 60, 42);
         blueNote.setBounds(xpos + 225 - 5, ypos, 60, 42);
         orangeNote.setBounds(xpos + 300 - 5, ypos, 60, 42);
+
+        int[] keys = (playerNumber == 2) ? Tab.getPlayer2Keys() : Tab.getPlayer1Keys();
+        greenNote.setKeyLabel(KeyEvent.getKeyText(keys[0]));
+        redNote.setKeyLabel(KeyEvent.getKeyText(keys[1]));
+        yellowNote.setKeyLabel(KeyEvent.getKeyText(keys[2]));
+        blueNote.setKeyLabel(KeyEvent.getKeyText(keys[3]));
+        orangeNote.setKeyLabel(KeyEvent.getKeyText(keys[4]));
+
         tab.add(noteStreakLabel);
         tab.add(multiplierLabel);
         tab.add(scoreLabel);

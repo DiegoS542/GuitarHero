@@ -42,6 +42,7 @@ public class Tab extends JPanel {
     ImageIcon stage;
     BufferedImage stageBuffer;
     private Timer gifTimer;
+    private Timer keyLabelTimer;
     int ypos;
     int xpos;
     private final JLabel noteStreak = new JLabel("Note Streak: 0");
@@ -583,6 +584,22 @@ public class Tab extends JPanel {
         playAudio();
         gameThread.start();
         SwingUtilities.invokeLater(this::requestFocusInWindow);
+
+        player.setShowKeyLabels(true);
+        if (multiplayer) {
+            player2.setShowKeyLabels(true);
+        }
+        if (keyLabelTimer != null) {
+            keyLabelTimer.stop();
+        }
+        keyLabelTimer = new Timer(5000, e -> {
+            player.setShowKeyLabels(false);
+            if (multiplayer) {
+                player2.setShowKeyLabels(false);
+            }
+        });
+        keyLabelTimer.setRepeats(false);
+        keyLabelTimer.start();
     }
 
     public void draw() {
@@ -819,6 +836,7 @@ public class Tab extends JPanel {
 
     public void switchToGameMenu(GameMenu mainMenu) {
         if (gifTimer != null) { gifTimer.stop(); gifTimer = null; }
+        if (keyLabelTimer != null) { keyLabelTimer.stop(); keyLabelTimer = null; }
         frame.getContentPane().removeAll();
         frame.add(mainMenu);
         mainMenu.resetMenu(frame);
@@ -830,6 +848,7 @@ public class Tab extends JPanel {
 
     public void switchToSongList() {
         if (gifTimer != null) { gifTimer.stop(); gifTimer = null; }
+        if (keyLabelTimer != null) { keyLabelTimer.stop(); keyLabelTimer = null; }
         mainMenu.restartAudio();
         frame.getContentPane().removeAll();
         frame.add(new SongList(mainMenu, frame, (int) screenSize.getWidth(), (int) screenSize.getHeight(), multiplayer ? 2 : 1));

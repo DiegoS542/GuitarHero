@@ -6,6 +6,8 @@ public class PlayerNote extends Note {
     private boolean released;
     private boolean clicked;
     private Color colorClick;
+    private String keyLabel;
+    private boolean showKeyLabel = true;
 
     public PlayerNote(Color color, Color borderColor, Color colorClick) {
         super(color, borderColor);
@@ -44,6 +46,15 @@ public class PlayerNote extends Note {
         this.clicked = clicked;
     }
 
+    public void setKeyLabel(String keyLabel) {
+        this.keyLabel = keyLabel;
+    }
+
+    public void setShowKeyLabel(boolean showKeyLabel) {
+        this.showKeyLabel = showKeyLabel;
+        repaint();
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -57,5 +68,15 @@ public class PlayerNote extends Note {
         //  Border set 2 Pix
         g2.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 8, radius, radius);
         super.paintComponent(g);
+
+        if (keyLabel != null && showKeyLabel) {
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            g2.setFont(new Font("Verdana", Font.BOLD, 16));
+            g2.setColor(Color.WHITE);
+            FontMetrics fm = g2.getFontMetrics();
+            int tx = (getWidth() - fm.stringWidth(keyLabel)) / 2;
+            int ty = (getHeight() + fm.getAscent()) / 2 - 2;
+            g2.drawString(keyLabel, tx, ty);
+        }
     }
 }
